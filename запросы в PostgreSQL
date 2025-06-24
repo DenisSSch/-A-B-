@@ -1,0 +1,88 @@
+CREATE TABLE test (  --создание таблицы
+  f0			float,
+	f1			float,
+	f2			float,
+	f3			float,
+	f4			float,
+	f5			float,
+	f6			float,
+	f7			float,
+	f8			float,
+	f9			float,
+	f10			float,
+	F11			float,
+	treatment	integer,
+	conversions integer,
+	visit		integer,
+	exposure	integer
+);
+
+----------------------------------------------------------------------------
+
+Загрузка данных через "Import data", в опциях активировать "Header".
+
+----------------------------------------------------------------------------
+
+select *  --проверка данных
+from public.test
+
+----------------------------------------------------------------------------
+
+SELECT  --Распределение контрольной и экспериментальной группы
+    treatment,
+    COUNT(treatment) AS counts,
+    COUNT(treatment) * 100 / SUM(COUNT(treatment)) OVER () percents
+FROM
+    public.test
+GROUP BY
+    treatment
+
+----------------------------------------------------------------------------
+
+SELECT  --Результат посещения сайта клиентами с воздействием
+    visit,
+    COUNT(treatment) AS counts,
+    COUNT(treatment) * 100 / SUM(COUNT(treatment)) OVER () percents
+FROM
+    public.test
+WHERE treatment = 1
+GROUP BY
+    visit;
+
+----------------------------------------------------------------------------
+
+SELECT  --Результат совершения покупки (конверсии) клиентами с воздействием после перехода на сайт
+    conversions,
+    SUM(visit) AS counts,
+    SUM(visit) * 100 / SUM(SUM(visit)) OVER () percents
+FROM
+    public.test
+WHERE treatment = 1
+GROUP BY
+    conversions;
+
+----------------------------------------------------------------------------
+
+SELECT  --Результат совершения покупки (конверсии) клиентами с воздействием
+    conversions,
+    COUNT(treatment) AS counts,
+    COUNT(treatment) * 100 / SUM(COUNT(treatment)) OVER () percents
+FROM
+    public.test
+WHERE treatment = 1
+GROUP BY
+    conversions;
+
+----------------------------------------------------------------------------
+
+SELECT  --Результат совершения покупки (конверсии) клиентами без воздействия
+    conversions,
+    COUNT(treatment) AS counts,
+    COUNT(treatment) * 100 / SUM(COUNT(treatment)) OVER () percents
+FROM
+    public.test
+WHERE treatment = 0
+GROUP BY
+    conversions;
+
+----------------------------------------------------------------------------
